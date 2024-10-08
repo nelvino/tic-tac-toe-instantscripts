@@ -1,18 +1,15 @@
 export function evaluateBoard(board, player) {
     const opponent = player === 'o' ? 'x' : 'o';
-    // First check if the computer can win
     const winningMove = findWinningMove(board, player);
     if (winningMove !== -1) {
        return winningMove;
     }
  
-    // Then check if it can block the player's winning move
     const blockingMove = findWinningMove(board, opponent);
     if (blockingMove !== -1) {
        return blockingMove;
     }
  
-    // Otherwise, pick a strategic move
     return pickBestMove(board, player);
  }
  
@@ -39,7 +36,6 @@ export function evaluateBoard(board, player) {
  }
  
  function pickBestMove(board) {
-    // Prioritize the center if available, then corners, then edges
     if (typeof board[4] === 'number') return 4;
     const corners = [0, 2, 6, 8];
     for (const corner of corners) {

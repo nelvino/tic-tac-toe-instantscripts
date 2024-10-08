@@ -41,15 +41,15 @@ export default class SetGameType extends Component {
 //	------------------------	------------------------	------------------------
 
 selTypeLive(e) {
-	this.props.onSetType('live', null); // Pass null as difficulty for live mode
+	this.props.onSetType('live', null);
 }
 
 selTypeCompEasy(e) {
-	this.props.onSetType('comp', 'easy'); // Pass 'easy' as difficulty
+	this.props.onSetType('comp', 'easy');
 }
 
 selTypeCompMid(e) {
-	this.props.onSetType('comp', 'mid'); // Pass 'easy' as difficulty
+	this.props.onSetType('comp', 'mid');
 }
 
 selTypeCompHard(e) {
