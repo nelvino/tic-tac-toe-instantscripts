@@ -216,7 +216,6 @@ turn_comp() {
 
     let c;
 
-    // Check for hard mode
     if (this.props.difficulty === 'hard') {
         const board = [];
         for (let i = 1; i <= 9; i++) {
@@ -234,7 +233,6 @@ turn_comp() {
 		if (this.compTurn % 2 === 1) {
             c = rand_arr_elem(empty_cells_arr);
         } else {
-            // Hard mode (strategic move)
             const board = [];
             for (let i = 1; i <= 9; i++) {
                 board.push(cell_vals['c' + i] || i);
@@ -395,7 +393,7 @@ turn_comp() {
 		for (let i = 1; i <= 9; i++) {
             const cell = this.refs['c' + i];
             if (cell) {
-                cell.classList.remove('win');  // Assuming 'win' is the class applying red color
+                cell.classList.remove('win');
             }
         }
     }
