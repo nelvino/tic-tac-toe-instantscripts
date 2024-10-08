@@ -6,6 +6,7 @@ import TweenMax from 'gsap'
 
 import rand_arr_elem from '../../helpers/rand_arr_elem'
 import rand_to_fro from '../../helpers/rand_to_fro'
+import { evaluateBoard } from '../../helpers/evaluateBoard';
 
 export default class SetName extends Component {
 
@@ -31,7 +32,8 @@ export default class SetName extends Component {
 				cell_vals: {},
 				next_turn_ply: true,
 				game_play: true,
-				game_stat: 'Start game'
+				game_stat: 'Start game',
+				difficulty: this.props.difficulty || 'easy'
 			}
 		else {
 			this.sock_start()
@@ -43,6 +45,8 @@ export default class SetName extends Component {
 				game_stat: 'Connecting'
 			}
 		}
+
+		this.compTurn = 0;
 	}
 
 //	------------------------	------------------------	------------------------
@@ -113,6 +117,7 @@ export default class SetName extends Component {
 			<div id='GameMain'>
 
 				<h1>Play {this.props.game_type}</h1>
+				<h2>Mode: {this.props.difficulty}</h2>
 
 				<div id="game_stat">
 					<div id="game_stat_msg">{this.state.game_stat}</div>
@@ -140,8 +145,15 @@ export default class SetName extends Component {
 					</tbody>
 					</table>
 				</div>
-
-				<button type='submit' onClick={this.end_game.bind(this)} className='button'><span>End Game <span className='fa fa-caret-right'></span></span></button>
+				<div id="buttons">
+					<button type='submit' onClick={this.end_game.bind(this)} className='button'><span>End Game <span className='fa fa-caret-right'></span></span></button>
+					
+					<button type="button" onClick={this.play_again.bind(this)} className="button">
+						<span>
+							Play Again <span className="fa fa-caret-right"></span>
+						</span>
+					</button>
+				</div>
 
 			</div>
 		)
@@ -191,32 +203,67 @@ export default class SetName extends Component {
 
 //	------------------------	------------------------	------------------------
 
-	turn_comp () {
+turn_comp() {
+    let { cell_vals } = this.state;
+    let empty_cells_arr = [];
 
-		let { cell_vals } = this.state
-		let empty_cells_arr = []
+    // Create an array of empty cells
+    for (let i = 1; i <= 9; i++) {
+        if (!cell_vals['c' + i]) {
+            empty_cells_arr.push('c' + i);
+        }
+    }
 
+    let c;
 
-		for (let i=1; i<=9; i++) 
-			!cell_vals['c'+i] && empty_cells_arr.push('c'+i)
-		// console.log(cell_vals, empty_cells_arr, rand_arr_elem(empty_cells_arr))
+    // Check for hard mode
+    if (this.props.difficulty === 'hard') {
+        const board = [];
+        for (let i = 1; i <= 9; i++) {
+            board.push(cell_vals['c' + i] || i); 
+        }
+        const move = evaluateBoard(board, 'o');
 
-		const c = rand_arr_elem(empty_cells_arr)
-		cell_vals[c] = 'o'
+        if (move >= 0 && move < 9 && !cell_vals['c' + (move + 1)]) {
+            c = 'c' + (move + 1);
+        } else {
+            console.error('Invalid move returned by evaluateBoard:', move);
+            c = rand_arr_elem(empty_cells_arr);
+        }
+    } else if (this.props.difficulty === 'mid') {
+		if (this.compTurn % 2 === 1) {
+            c = rand_arr_elem(empty_cells_arr);
+        } else {
+            // Hard mode (strategic move)
+            const board = [];
+            for (let i = 1; i <= 9; i++) {
+                board.push(cell_vals['c' + i] || i);
+            }
+            const move = evaluateBoard(board, 'o');
 
-		TweenMax.from(this.refs[c], 0.7, {opacity: 0, scaleX:0, scaleY:0, ease: Power4.easeOut})
+            if (move >= 0 && move < 9 && !cell_vals['c' + (move + 1)]) {
+                c = 'c' + (move + 1);
+            } else {
+                console.error('Invalid move returned by evaluateBoard:', move);
+                c = rand_arr_elem(empty_cells_arr);
+            }
+        }
+        this.compTurn++; 
+	} else {
+        c = rand_arr_elem(empty_cells_arr);
+    }
 
+    cell_vals[c] = 'o';
 
-		// this.setState({
-		// 	cell_vals: cell_vals,
-		// 	next_turn_ply: true
-		// })
+    if (this.refs[c]) {
+        TweenMax.from(this.refs[c], 0.7, { opacity: 0, scaleX: 0, scaleY: 0, ease: Power4.easeOut });
+    } else {
+        console.warn('TweenMax target is null or undefined:', c);
+    }
 
-		this.state.cell_vals = cell_vals
-
-		this.check_turn()
-	}
-
+    this.setState({ cell_vals });
+    this.check_turn();
+}
 
 //	------------------------	------------------------	------------------------
 //	------------------------	------------------------	------------------------
@@ -338,6 +385,20 @@ export default class SetName extends Component {
 		this.props.onEndGame()
 	}
 
+	play_again() {
+        this.setState({
+            cell_vals: {},
+            next_turn_ply: true,
+            game_play: true,
+            game_stat: 'Start game',
+        });
+		for (let i = 1; i <= 9; i++) {
+            const cell = this.refs['c' + i];
+            if (cell) {
+                cell.classList.remove('win');  // Assuming 'win' is the class applying red color
+            }
+        }
+    }
 
 
 }
