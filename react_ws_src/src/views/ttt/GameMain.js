@@ -6,6 +6,7 @@ import TweenMax from 'gsap'
 
 import rand_arr_elem from '../../helpers/rand_arr_elem'
 import rand_to_fro from '../../helpers/rand_to_fro'
+import { evaluateBoard } from '../../helpers/evaluateBoard';
 
 export default class SetName extends Component {
 
@@ -31,7 +32,8 @@ export default class SetName extends Component {
 				cell_vals: {},
 				next_turn_ply: true,
 				game_play: true,
-				game_stat: 'Start game'
+				game_stat: 'Start game',
+				difficulty: this.props.difficulty || 'easy'
 			}
 		else {
 			this.sock_start()
@@ -191,32 +193,48 @@ export default class SetName extends Component {
 
 //	------------------------	------------------------	------------------------
 
-	turn_comp () {
+turn_comp() {
+    let { cell_vals } = this.state;
+    let empty_cells_arr = [];
 
-		let { cell_vals } = this.state
-		let empty_cells_arr = []
+    // Create an array of empty cells
+    for (let i = 1; i <= 9; i++) {
+        if (!cell_vals['c' + i]) {
+            empty_cells_arr.push('c' + i);
+        }
+    }
 
+    let c;
 
-		for (let i=1; i<=9; i++) 
-			!cell_vals['c'+i] && empty_cells_arr.push('c'+i)
-		// console.log(cell_vals, empty_cells_arr, rand_arr_elem(empty_cells_arr))
+    // Check for hard mode
+    if (this.props.difficulty === 'hard') {
+        const board = [];
+        for (let i = 1; i <= 9; i++) {
+            board.push(cell_vals['c' + i] || i); 
+        }
+        const move = evaluateBoard(board, 'o');
 
-		const c = rand_arr_elem(empty_cells_arr)
-		cell_vals[c] = 'o'
+        if (move >= 0 && move < 9 && !cell_vals['c' + (move + 1)]) {
+            c = 'c' + (move + 1);
+        } else {
+            console.error('Invalid move returned by evaluateBoard:', move);
+            c = rand_arr_elem(empty_cells_arr);
+        }
+    } else {
+        c = rand_arr_elem(empty_cells_arr);
+    }
 
-		TweenMax.from(this.refs[c], 0.7, {opacity: 0, scaleX:0, scaleY:0, ease: Power4.easeOut})
+    cell_vals[c] = 'o';
 
+    if (this.refs[c]) {
+        TweenMax.from(this.refs[c], 0.7, { opacity: 0, scaleX: 0, scaleY: 0, ease: Power4.easeOut });
+    } else {
+        console.warn('TweenMax target is null or undefined:', c);
+    }
 
-		// this.setState({
-		// 	cell_vals: cell_vals,
-		// 	next_turn_ply: true
-		// })
-
-		this.state.cell_vals = cell_vals
-
-		this.check_turn()
-	}
-
+    this.setState({ cell_vals });
+    this.check_turn();
+}
 
 //	------------------------	------------------------	------------------------
 //	------------------------	------------------------	------------------------
