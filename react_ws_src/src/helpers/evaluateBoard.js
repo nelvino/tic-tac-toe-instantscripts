@@ -38,7 +38,7 @@ export function evaluateBoard(board, player) {
     return -1;
  }
  
- function pickBestMove(board, player) {
+ function pickBestMove(board) {
     // Prioritize the center if available, then corners, then edges
     if (typeof board[4] === 'number') return 4;
     const corners = [0, 2, 6, 8];

@@ -70,7 +70,7 @@ export default class Ttt extends Component {
     this.setState(
       {
         game_type: type,
-        difficulty: difficulty, // Save difficulty
+        difficulty: difficulty,
       },
       this.upd_game_step
     );
