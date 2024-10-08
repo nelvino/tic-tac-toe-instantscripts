@@ -142,8 +142,15 @@ export default class SetName extends Component {
 					</tbody>
 					</table>
 				</div>
-
-				<button type='submit' onClick={this.end_game.bind(this)} className='button'><span>End Game <span className='fa fa-caret-right'></span></span></button>
+				<div id="buttons">
+					<button type='submit' onClick={this.end_game.bind(this)} className='button'><span>End Game <span className='fa fa-caret-right'></span></span></button>
+					
+					<button type="button" onClick={this.play_again.bind(this)} className="button">
+						<span>
+							Play Again <span className="fa fa-caret-right"></span>
+						</span>
+					</button>
+				</div>
 
 			</div>
 		)
@@ -356,6 +363,20 @@ turn_comp() {
 		this.props.onEndGame()
 	}
 
+	play_again() {
+        this.setState({
+            cell_vals: {},
+            next_turn_ply: true,
+            game_play: true,
+            game_stat: 'Start game',
+        });
+		for (let i = 1; i <= 9; i++) {
+            const cell = this.refs['c' + i];
+            if (cell) {
+                cell.classList.remove('win');  // Assuming 'win' is the class applying red color
+            }
+        }
+    }
 
 
 }
