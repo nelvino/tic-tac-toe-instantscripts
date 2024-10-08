@@ -24,7 +24,7 @@ export default class SetGameType extends Component {
 					<span>Against a computer (Easy) <span className='fa fa-caret-right'></span></span>
 				</button>
 
-				<button type='submit' onClick={this.selTypeCompEasy.bind(this)} className='button long'>
+				<button type='submit' onClick={this.selTypeCompMid.bind(this)} className='button long'>
 					<span>Against a computer (Mid) <span className='fa fa-caret-right'></span></span>
 				</button>
 				
@@ -48,7 +48,7 @@ selTypeCompEasy(e) {
 	this.props.onSetType('comp', 'easy'); // Pass 'easy' as difficulty
 }
 
-selTypeCompEasy(e) {
+selTypeCompMid(e) {
 	this.props.onSetType('comp', 'mid'); // Pass 'easy' as difficulty
 }
 
