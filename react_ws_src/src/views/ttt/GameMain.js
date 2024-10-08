@@ -45,6 +45,8 @@ export default class SetName extends Component {
 				game_stat: 'Connecting'
 			}
 		}
+
+		this.compTurn = 0;
 	}
 
 //	------------------------	------------------------	------------------------
@@ -115,6 +117,7 @@ export default class SetName extends Component {
 			<div id='GameMain'>
 
 				<h1>Play {this.props.game_type}</h1>
+				<h2>Mode: {this.props.difficulty}</h2>
 
 				<div id="game_stat">
 					<div id="game_stat_msg">{this.state.game_stat}</div>
@@ -227,7 +230,26 @@ turn_comp() {
             console.error('Invalid move returned by evaluateBoard:', move);
             c = rand_arr_elem(empty_cells_arr);
         }
-    } else {
+    } else if (this.props.difficulty === 'mid') {
+		if (this.compTurn % 2 === 1) {
+            c = rand_arr_elem(empty_cells_arr);
+        } else {
+            // Hard mode (strategic move)
+            const board = [];
+            for (let i = 1; i <= 9; i++) {
+                board.push(cell_vals['c' + i] || i);
+            }
+            const move = evaluateBoard(board, 'o');
+
+            if (move >= 0 && move < 9 && !cell_vals['c' + (move + 1)]) {
+                c = 'c' + (move + 1);
+            } else {
+                console.error('Invalid move returned by evaluateBoard:', move);
+                c = rand_arr_elem(empty_cells_arr);
+            }
+        }
+        this.compTurn++; 
+	} else {
         c = rand_arr_elem(empty_cells_arr);
     }
 
